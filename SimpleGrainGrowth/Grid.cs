@@ -17,7 +17,7 @@ namespace SimpleGrainGrowth
         private int gridCellWidth = 10;
         private int gridCellHeight = 10;
         private double cellSize = 0;
-        private Random random = new Random();
+        private static Random random = new Random();
         private uint grains = 0;
 
 
@@ -67,6 +67,11 @@ namespace SimpleGrainGrowth
         public List<List<Cell>> GetCells()
         {
             return cells;
+        }
+
+        public Cell GetCell(int x, int y)
+        {
+            return this.cells[x][y];
         }
 
         public uint GetGrains()
@@ -190,35 +195,15 @@ namespace SimpleGrainGrowth
             for (int i = 0; i < cells.Count; i++)
             {
                 for (int j = 0; j < cells[i].Count; j++)
-                {
-                    //type = new int[] { 0, 0, 0, 0 };
-                    //if (j - 1 >= 0)
-                    //{
-                    //    type[0] = cells[i][j - 1].GetType();
-                    //}
-                    //if (i + 1 < sizeY)
-                    //{
-                    //    type[1] = cells[i + 1][j].GetType();
-                    //}
-                    //if (j + 1 < sizeX)
-                    //{
-                    //    type[2] = cells[i][j + 1].GetType();
-                    //}
-                    //if (i - 1 >= 0)
-                    //{
-                    //    type[3] = cells[i - 1][j].GetType();
-                    //}
-                    
+                {                 
                     type = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
                     int index = selestedPatternIndex;
+
                     if (selestedPatternIndex == 8)
-                    {
                         index = random.Next(2, 4);
-                    }
                     else if (selestedPatternIndex == 9)
-                    {
                         index = random.Next(4, 8);
-                    }
+                   
 
                     if (patterns[index][0] == 1 && i + 1 < sizeY && j + 1 < sizeX)
                         type[0] = cells[i + 1][j + 1].GetType();
@@ -237,29 +222,7 @@ namespace SimpleGrainGrowth
                     if (patterns[index][7] == 1 && j + 1 < sizeX)
                         type[7] = cells[i][j + 1].GetType();
 
-
-                    int maxRepeats = 0;
-                    int mostCommonValue = 0;
-                    for (int k = 0; k < type.Length; k++)
-                    {
-                        int value = type[k];
-                        int repeats = 0;
-                        for (int l = 0; l < type.Length; l++)
-                            if (type[l] == value && type[l] != 0)
-                                repeats++;
-                        if (repeats > maxRepeats)
-                        {
-
-                            maxRepeats = repeats;
-                            mostCommonValue = value;
-                        }
-                        else if (repeats == maxRepeats && random.Next(1) == 1)
-                        {
-                            maxRepeats = repeats;
-                            mostCommonValue = value;
-                        }
-                    }
-                    neighbours[i][j] = mostCommonValue;
+                    neighbours[i][j] = GetMostRepeatedElenent(type);
                 }
             }
             return neighbours;
@@ -285,34 +248,6 @@ namespace SimpleGrainGrowth
             {
                 for (int j = 0; j < cells[i].Count; j++)
                 {
-                    //type = new int[] { 0, 0, 0, 0 };
-                    //if (j - 1 >= 0)
-                    //    type[0] = cells[i][j - 1].GetType();
-                    //else
-                    //    type[0] = cells[i][cells[i].Count - 1].GetType();
-
-
-                    //if (i + 1 < sizeY)
-
-                    //    type[1] = cells[i + 1][j].GetType();
-                    //else
-                    //    type[1] = cells[0][j].GetType();
-
-
-
-                    //if (j + 1 < sizeX)
-                    //    type[2] = cells[i][j + 1].GetType();
-                    //else
-                    //    type[2] = cells[i][0].GetType();
-
-
-
-                    //if (i - 1 >= 0)
-                    //    type[3] = cells[i - 1][j].GetType();
-                    //else
-                    //    type[3] = cells[cells.Count - 1][j].GetType();
-
-
                     int index = selestedPatternIndex;
                     type = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -396,30 +331,7 @@ namespace SimpleGrainGrowth
                         else
                             type[7] = cells[i][0].GetType();
                     }
-
-
-                    int maxRepeats = 0;
-                    int mostCommonValue = 0;
-                    for (int k = 0; k < type.Length; k++)
-                    {
-                        int value = type[k];
-                        int repeats = 0;
-                        for (int l = 0; l < type.Length; l++)
-                            if (type[l] == value && type[l] != 0)
-                                repeats++;
-                        if (repeats > maxRepeats)
-                        {
-
-                            maxRepeats = repeats;
-                            mostCommonValue = value;
-                        }
-                        else if (repeats == maxRepeats && random.Next(1) == 1)
-                        {
-                            maxRepeats = repeats;
-                            mostCommonValue = value;
-                        }
-                    }
-                    neighbours[i][j] = mostCommonValue;
+                    neighbours[i][j] = GetMostRepeatedElenent(type);
                 }
             }
             return neighbours;
@@ -453,30 +365,55 @@ namespace SimpleGrainGrowth
                                 cellNeighbours.Add(cells[l][k].GetType());
                         }
                     }
+                    neighbours[j][i] = GetMostRepeatedElenent(cellNeighbours);
+                }
+            }
 
-                    //check most repeated element
-                    int maxRepeats = 0;
-                    int mostCommonValue = 0;
-                    for (int k = 0; k < cellNeighbours.Count; k++)
+            return neighbours;
+        }
+
+        public List<List<int>> CheckNeighbourhoodRadiusPeriodic(int radius)
+        {
+            int sizeY = cells.Count;
+            int sizeX = cells[0].Count;
+
+            List<List<int>> neighbours = new List<List<int>>();
+            for (int i = 0; i < sizeY; i++)
+            {
+                neighbours.Add(new List<int>());
+                for (int j = 0; j < sizeX; j++)
+                    neighbours[i].Add(0);
+            }
+
+            for (int i = 0; i < sizeY; i++)
+            {
+                for (int j = 0; j < sizeX; j++)
+                {
+                    Cell cell = cells[j][i];
+                    List<int> cellNeighbours = new List<int>();
+                    for (int k = 0; k < sizeY; k++)
                     {
-                        int value = cellNeighbours[k];
-                        int repeats = 0;
-                        for (int l = 0; l < cellNeighbours.Count; l++)
-                            if (cellNeighbours[l] == value && cellNeighbours[l] != 0)
-                                repeats++;
-                        if (repeats > maxRepeats)
+                        for (int l = 0; l < sizeX; l++)
                         {
+                            if (Math.Pow(cell.GetCenterOfMass().X - cells[l][k].GetCenterOfMass().X, 2) +
+                                Math.Pow(cell.GetCenterOfMass().Y - cells[l][k].GetCenterOfMass().Y, 2) <= radius * radius)
+                                cellNeighbours.Add(cells[l][k].GetType());
+                            else if(Math.Pow(cell.GetCenterOfMass().X + (gridCellWidth * cellSize) - cells[l][k].GetCenterOfMass().X, 2) +
+                                Math.Pow(cell.GetCenterOfMass().Y - cells[l][k].GetCenterOfMass().Y, 2) <= radius * radius)
+                                cellNeighbours.Add(cells[l][k].GetType());
+                            else if (Math.Pow(cell.GetCenterOfMass().X - cells[l][k].GetCenterOfMass().X, 2) +
+                                Math.Pow(cell.GetCenterOfMass().Y + (gridCellHeight * cellSize) - cells[l][k].GetCenterOfMass().Y, 2) <= radius * radius)
+                                cellNeighbours.Add(cells[l][k].GetType());
+                            else if (Math.Pow(cell.GetCenterOfMass().X - (gridCellWidth * cellSize) - cells[l][k].GetCenterOfMass().X, 2) +
+                                Math.Pow(cell.GetCenterOfMass().Y - cells[l][k].GetCenterOfMass().Y, 2) <= radius * radius)
+                                cellNeighbours.Add(cells[l][k].GetType());
+                            else if (Math.Pow(cell.GetCenterOfMass().X - cells[l][k].GetCenterOfMass().X, 2) +
+                                Math.Pow(cell.GetCenterOfMass().Y - (gridCellHeight * cellSize) - cells[l][k].GetCenterOfMass().Y, 2) <= radius * radius)
+                                cellNeighbours.Add(cells[l][k].GetType());
 
-                            maxRepeats = repeats;
-                            mostCommonValue = value;
-                        }
-                        else if (repeats == maxRepeats && random.Next(1) == 1)
-                        {
-                            maxRepeats = repeats;
-                            mostCommonValue = value;
                         }
                     }
-                    neighbours[j][i] = mostCommonValue;
+                    neighbours[j][i] = GetMostRepeatedElenent(cellNeighbours);
                 }
             }
 
@@ -503,5 +440,169 @@ namespace SimpleGrainGrowth
             }
         }
 
+        public static int GetMostRepeatedElenent(List<int> list)
+        {
+            int maxRepeats = 0;
+            int mostCommonValue = 0;
+            for (int k = 0; k < list.Count; k++)
+            {
+                int value = list[k];
+                int repeats = 0;
+                for (int l = 0; l < list.Count; l++)
+                    if (list[l] == value && list[l] != 0)
+                        repeats++;
+                if (repeats > maxRepeats)
+                {
+
+                    maxRepeats = repeats;
+                    mostCommonValue = value;
+                }
+                else if (repeats == maxRepeats && random.Next(1) == 1)
+                {
+                    maxRepeats = repeats;
+                    mostCommonValue = value;
+                }
+            }
+
+            return mostCommonValue;
+        }
+
+        public static int GetMostRepeatedElenent(int[] array)
+        {
+            int maxRepeats = 0;
+            int mostCommonValue = 0;
+            for (int k = 0; k < array.Length; k++)
+            {
+                int value = array[k];
+                int repeats = 0;
+                for (int l = 0; l < array.Length; l++)
+                    if (array[l] == value && array[l] != 0)
+                        repeats++;
+                if (repeats > maxRepeats)
+                {
+
+                    maxRepeats = repeats;
+                    mostCommonValue = value;
+                }
+                else if (repeats == maxRepeats && random.Next(1) == 1)
+                {
+                    maxRepeats = repeats;
+                    mostCommonValue = value;
+                }
+            }
+
+            return mostCommonValue;
+        }
+
+        public void MonteCarloAbsorbing()
+        {
+            int[] cellsX = Enumerable.Range(0, (this.gridCellWidth)).ToArray();
+            int[] cellsY = Enumerable.Range(0, (this.gridCellHeight)).ToArray();
+            //int[] cellsX = { 1 };
+            //int[] cellsY = { 1 };
+
+
+            //PrintArray(cellsX);
+            //PrintArray(cellsY);
+            Shuffle(cellsX);
+            Shuffle(cellsY);
+            int index = selestedPatternIndex;
+            List<int> neighbours = new List<int>();
+
+            for(int i = 0; i < cellsX.Length; i++)
+            {
+                for(int j = 0; j < cellsY.Length; j++)
+                {
+                    int y = cellsX[i];
+                    int x = cellsY[j];
+
+                    if (selestedPatternIndex == 8)
+                        index = random.Next(2, 4);
+                    else if (selestedPatternIndex == 9)
+                        index = random.Next(4, 8);
+
+                    if (patterns[index][0] == 1 && x - 1 >= 0 && y - 1 >= 0)
+                        neighbours.Add(cells[x - 1][y - 1].GetType());
+                    if (patterns[index][1] == 1 && x - 1 >= 0)
+                        neighbours.Add(cells[x - 1][y].GetType());
+                    if (patterns[index][2] == 1 && x - 1 >= 0 && y + 1 < cells[j].Count)
+                        neighbours.Add(cells[x - 1][y + 1].GetType());
+                    if (patterns[index][3] == 1 && y + 1 < cells[j].Count)
+                        neighbours.Add(cells[x][y + 1].GetType());
+                    if (patterns[index][4] == 1 && x + 1 < cells.Count && y + 1 < cells[j].Count)
+                        neighbours.Add(cells[x + 1][y + 1].GetType());
+                    if (patterns[index][5] == 1 && x + 1 < cells.Count)
+                        neighbours.Add(cells[x + 1][y].GetType());
+                    if (patterns[index][6] == 1 && x + 1 < cells.Count && y - 1 >= 0)
+                        neighbours.Add(cells[x + 1][y - 1].GetType());
+                    if (patterns[index][7] == 1 && y - 1 >= 0)
+                        neighbours.Add(cells[x][y - 1].GetType());
+                    
+
+                    int energy = CalculateEnergy(this.cells[x][y].GetType(), neighbours);
+                    int randomType = neighbours[random.Next(0, neighbours.Count)];
+                    int randomEnergy = CalculateEnergy(randomType, neighbours);
+
+
+                    while(energy < randomEnergy)
+                    {
+                        randomType = neighbours[random.Next(0, neighbours.Count)];
+                        randomEnergy = CalculateEnergy(randomType, neighbours);
+                    }
+
+                    //Console.WriteLine("energy: " + energy);
+                    //Console.WriteLine("randomType: " + randomType);
+                    //Console.WriteLine("randomEnergy: " + randomEnergy);
+                    //PrintList(neighbours);
+
+                    this.cells[x][y].SetType(randomType);
+                    neighbours = new List<int>();
+                }
+            }
+
+        }
+
+        public static int CalculateEnergy(int type, List<int> neighbours)
+        {
+            int energy = 0;
+            for(int i = 0; i < neighbours.Count; i++)
+            {
+                if (neighbours[i] != type)
+                    energy++;
+            }
+
+            return energy;
+        }
+
+        public static void PrintArray(int[] arr)
+        {
+            Console.Write("Array: ");
+            for (int i = 0; i < arr.Length; i++)
+                Console.Write(arr[i] + " ");
+            Console.WriteLine();
+        }
+
+        public static void PrintList(List<int> list)
+        {
+            Console.Write("List: ");
+            for (int i = 0; i < list.Count; i++)
+                Console.Write(list[i] + " ");
+            Console.WriteLine();
+        }
+
+        /// Knuth shuffle
+        public static void Shuffle(int[] array)
+        {
+            Random random = new Random();
+            int n = array.Count();
+            while (n > 1)
+            {
+                n--;
+                int i = random.Next(n + 1);
+                int temp = array[i];
+                array[i] = array[n];
+                array[n] = temp;
+            }
+        }
     }
 }

@@ -11,13 +11,12 @@ using System.Windows.Forms;
 
 namespace SimpleGrainGrowth
 {
-
     public partial class Form1 : Form
     {
         private readonly Graphics g;
         private readonly Bitmap bm;
         private Grid grid;
-        Random random = new Random();
+        private static Random random = new Random();
         private static List<Color> randomColours = new List<Color>();
 
         CheckNeighbourhood checkNeighbouthood;
@@ -31,7 +30,7 @@ namespace SimpleGrainGrowth
             g = Graphics.FromImage(bm);
             g.Clear(Color.White);
             pictureBox1.Image = bm;
-            grid = new Grid(pictureBox1, 10, 10);
+            grid = new Grid(pictureBox1, 33, 33);
 
             comboBox1.SelectedIndex = 0;
             comboBox2.SelectedIndex = 0;
@@ -39,7 +38,6 @@ namespace SimpleGrainGrowth
             grid.PrintMesh(pictureBox1, g, bm);
 
         }
-
 
         private void Button1_Click(object sender, EventArgs e)
         {
@@ -105,7 +103,7 @@ namespace SimpleGrainGrowth
             int gridCellHeight = 0;
             int gridCellWidth = 0;
 
-            if (int.TryParse(textBox2.Text, out gridCellWidth) && int.TryParse(textBox1.Text, out gridCellHeight))
+            if (int.TryParse(textBox1.Text, out gridCellWidth) && int.TryParse(textBox2.Text, out gridCellHeight))
                 Logs.Text = "Success!";
             else
                 Logs.Text = "Fail!";
@@ -128,7 +126,7 @@ namespace SimpleGrainGrowth
             int grainsX = 0;
             int grainsY = 0;
 
-            if (int.TryParse(textBox4.Text, out grainsX) && int.TryParse(textBox3.Text, out grainsY))
+            if (int.TryParse(textBox3.Text, out grainsX) && int.TryParse(textBox4.Text, out grainsY))
                 Logs.Text = "Success!";
             else
                 Logs.Text = "Fail!";
@@ -331,8 +329,8 @@ namespace SimpleGrainGrowth
         {
             if (comboBox2.SelectedIndex == 10 && comboBox1.SelectedIndex == 0)
                 checkNeighbouthood = new CheckNeighbourhood(grid.CheckNeighbourhoodRadiusAbsorbing);
-            else if(comboBox2.SelectedIndex == 10 && comboBox1.SelectedIndex == 1)
-                Debug.WriteLine("Radius periodic");
+            else if (comboBox2.SelectedIndex == 10 && comboBox1.SelectedIndex == 1)
+                checkNeighbouthood = new CheckNeighbourhood(grid.CheckNeighbourhoodRadiusPeriodic);
             else if (comboBox1.SelectedIndex == 0)
                 checkNeighbouthood = new CheckNeighbourhood(grid.CheckNeighbourhoodAbsorbing);
             else if (comboBox1.SelectedIndex == 1)
@@ -344,7 +342,7 @@ namespace SimpleGrainGrowth
             if (comboBox2.SelectedIndex == 10 && comboBox1.SelectedIndex == 0)
                 checkNeighbouthood = new CheckNeighbourhood(grid.CheckNeighbourhoodRadiusAbsorbing);
             else if (comboBox2.SelectedIndex == 10 && comboBox1.SelectedIndex == 1)
-                Debug.WriteLine("Radius periodic");
+                checkNeighbouthood = new CheckNeighbourhood(grid.CheckNeighbourhoodRadiusPeriodic);
             else if (comboBox2.SelectedIndex == 0)
                 grid.SetPatternIndex(0);
             else if (comboBox2.SelectedIndex == 1)
@@ -382,5 +380,31 @@ namespace SimpleGrainGrowth
             if (checkBox1.Checked)
                 grid.PrintMesh(pictureBox1, g, bm);
         }
+
+
+
+        private void Button8_Click(object sender, EventArgs e)
+        {
+            int counter;
+
+            if (int.TryParse(textBox9.Text, out counter))
+                Logs.Text = "Success!";
+            else
+                Logs.Text = "Fail!";
+
+            if (comboBox1.SelectedIndex == 0)
+                for (int i = 0; i < counter; i++)
+                    grid.MonteCarloAbsorbing();
+            else if (comboBox1.SelectedIndex == 1)
+                Logs.Text = "TO DO";
+
+                grid.PrintGrid(pictureBox1, g, bm, checkBox2.Checked);
+            if (checkBox1.Checked)
+                grid.PrintMesh(pictureBox1, g, bm);
+
+        }
+
+
+
     }
 }
