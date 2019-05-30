@@ -23,7 +23,7 @@ namespace SimpleGrainGrowth
 
 
         private Dictionary<int, int[]> patterns = new Dictionary<int, int[]>();
-        int selestedPatternIndex = 0;
+        int selectedPatternIndex = 0;
 
         public Grid(PictureBox pb, int gridCellHeight, int gridCellWidth)
         {
@@ -56,7 +56,7 @@ namespace SimpleGrainGrowth
 
         public void SetPatternIndex(int index)
         {
-            this.selestedPatternIndex = index;
+            this.selectedPatternIndex = index;
         }
 
         public void SetCellType(int i, int j, int type)
@@ -126,14 +126,11 @@ namespace SimpleGrainGrowth
             //vertical
             for (int i = 0; i <= gridCellWidth; i++)
             {
-                //g.DrawLine(blackP, Convert.ToSingle(i * sizeCellWidth), 0, Convert.ToSingle(i * sizeCellWidth), pb.Height);
                 g.DrawLine(blackP, Convert.ToSingle(i * cellSize) - 1, 0, Convert.ToSingle(i * cellSize) - 1, Convert.ToSingle(gridCellHeight * cellSize));
-
             }
             //horizontal
             for (int i = 0; i <= gridCellHeight; i++)
             {
-                //g.DrawLine(blackP, 0, Convert.ToSingle(i * sizeCellHeight), pb.Width, Convert.ToSingle(i * sizeCellHeight));
                 g.DrawLine(blackP, 0, Convert.ToSingle(i * cellSize) - 1, Convert.ToSingle(gridCellWidth * cellSize), Convert.ToSingle(i * cellSize) - 1);
             }
 
@@ -144,14 +141,12 @@ namespace SimpleGrainGrowth
         {
             g.Clear(Color.White);
             Brush redB = Brushes.Red;
-            Brush greenB = Brushes.Green;
 
             for (int i = 0; i < gridCellHeight; i++)
             {
                 for (int j = 0; j < gridCellWidth; j++)
                 {
                     Cell cell = cells[i][j];
-                    int type = cell.GetType();
 
                     Color color;
                     if (cell.GetType() == 0)
@@ -197,11 +192,11 @@ namespace SimpleGrainGrowth
                 for (int j = 0; j < cells[i].Count; j++)
                 {                 
                     type = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
-                    int index = selestedPatternIndex;
+                    int index = selectedPatternIndex;
 
-                    if (selestedPatternIndex == 8)
+                    if (selectedPatternIndex == 8)
                         index = random.Next(2, 4);
-                    else if (selestedPatternIndex == 9)
+                    else if (selectedPatternIndex == 9)
                         index = random.Next(4, 8);
                    
 
@@ -248,14 +243,14 @@ namespace SimpleGrainGrowth
             {
                 for (int j = 0; j < cells[i].Count; j++)
                 {
-                    int index = selestedPatternIndex;
+                    int index = selectedPatternIndex;
                     type = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 
-                    if (selestedPatternIndex == 8)
+                    if (selectedPatternIndex == 8)
                     {
                         index = random.Next(2, 4);
                     }
-                    else if (selestedPatternIndex == 9)
+                    else if (selectedPatternIndex == 9)
                     {
                         index = random.Next(4, 8);
                     }
@@ -341,6 +336,7 @@ namespace SimpleGrainGrowth
         {
             int sizeY = cells.Count;
             int sizeX = cells[0].Count;
+            
 
             List<List<int>> neighbours = new List<List<int>>();
             for (int i = 0; i < sizeY; i++)
@@ -354,14 +350,17 @@ namespace SimpleGrainGrowth
             {
                 for(int j = 0; j < sizeX; j++)
                 {
-                    Cell cell = cells[j][i];
+                    //Cell cell = cells[j][i];
+                    if (cells[j][i].GetType() != 0)
+                        continue;
                     List<int> cellNeighbours = new List<int>();
+                    
                     for (int k = 0; k < sizeY; k++)
                     {
                         for (int l = 0; l < sizeX; l++)
                         {
-                            if (Math.Pow(cell.GetCenterOfMass().X - cells[l][k].GetCenterOfMass().X, 2) +
-                                Math.Pow(cell.GetCenterOfMass().Y - cells[l][k].GetCenterOfMass().Y, 2) <= radius * radius)
+                            if (Math.Pow(cells[j][i].GetCenterOfMass().X - cells[l][k].GetCenterOfMass().X, 2) +
+                                Math.Pow(cells[j][i].GetCenterOfMass().Y - cells[l][k].GetCenterOfMass().Y, 2) <= radius * radius)
                                 cellNeighbours.Add(cells[l][k].GetType());
                         }
                     }
@@ -506,7 +505,7 @@ namespace SimpleGrainGrowth
             //PrintArray(cellsY);
             Shuffle(cellsX);
             Shuffle(cellsY);
-            int index = selestedPatternIndex;
+            int index = selectedPatternIndex;
             List<int> neighbours = new List<int>();
 
             for(int i = 0; i < cellsX.Length; i++)
@@ -516,9 +515,9 @@ namespace SimpleGrainGrowth
                     int y = cellsX[i];
                     int x = cellsY[j];
 
-                    if (selestedPatternIndex == 8)
+                    if (selectedPatternIndex == 8)
                         index = random.Next(2, 4);
-                    else if (selestedPatternIndex == 9)
+                    else if (selectedPatternIndex == 9)
                         index = random.Next(4, 8);
 
                     if (patterns[index][0] == 1 && x - 1 >= 0 && y - 1 >= 0)
@@ -604,5 +603,6 @@ namespace SimpleGrainGrowth
                 array[n] = temp;
             }
         }
+
     }
 }

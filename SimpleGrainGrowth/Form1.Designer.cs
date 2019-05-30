@@ -95,7 +95,7 @@
             // 
             this.numericUpDown1.Location = new System.Drawing.Point(6, 41);
             this.numericUpDown1.Maximum = new decimal(new int[] {
-            1000,
+            10000,
             0,
             0,
             0});
@@ -274,7 +274,7 @@
             // Logs
             // 
             this.Logs.AutoSize = true;
-            this.Logs.Location = new System.Drawing.Point(16, 465);
+            this.Logs.Location = new System.Drawing.Point(12, 491);
             this.Logs.Name = "Logs";
             this.Logs.Size = new System.Drawing.Size(62, 17);
             this.Logs.TabIndex = 9;

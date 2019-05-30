@@ -17,6 +17,21 @@ namespace SimpleGrainGrowth
             this.size = size;
             this.centerOfMass = new Point(random.Next(position.X, position.X + size.Width), random.Next(position.Y, position.Y + size.Height));
         }
+        public Cell(Point position, Size size, Random random, int type, Point centerOfMass)
+        {
+            this.type = type;
+            this.position = position;
+            this.size = size;
+            this.centerOfMass = centerOfMass;
+        }
+
+        public Cell(ref Cell cell)
+        {
+            this.type = cell.type;
+            this.position = cell.position;
+            this.size = cell.size;
+            this.centerOfMass = cell.centerOfMass;
+        }
 
         public new int GetType()
         {

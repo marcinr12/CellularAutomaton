@@ -165,35 +165,26 @@ namespace SimpleGrainGrowth
             else
                 Logs.Text = "Fail!";
 
+            if (cellsCounter > grid.GetCells().Count * grid.GetCells()[0].Count)
+            {
+                cellsCounter = grid.GetCells().Count * grid.GetCells()[0].Count;
+                Logs.Text = "Set: " + cellsCounter;
+            }            
+
             grid.SetGrains(Convert.ToUInt32(cellsCounter));
             CreateRandomColorsList(cellsCounter);
 
-            List<int> randomX = new List<int>();
-            List<int> randomY = new List<int>();
-
-            int attemps = 1000000;
-
-            while (randomX.Count < cellsCounter && attemps > 0)
+            int setCells = 0;
+            while(setCells < cellsCounter)
             {
                 int x = random.Next(0, grid.GetCells().Count);
                 int y = random.Next(0, grid.GetCells()[0].Count);
-
-                if (!randomX.Contains(x) || !randomY.Contains(y))
+                if (grid.GetCells()[x][y].GetType() == 0)
                 {
-                    randomX.Add(x);
-                    randomY.Add(y);
-                    attemps = 1000000;
+                    setCells++;
+                    grid.SetCellType(x, y, setCells);
                 }
-                attemps--;
             }
-
-            if (attemps <= 0)
-            {
-                Logs.Text = "Set: " + randomX.Count;
-            }
-
-            for (int i = 0; i < randomX.Count; i++)
-                grid.SetCellType(randomX[i], randomY[i], i + 1);
 
             grid.PrintGrid(pictureBox1, g, bm, checkBox2.Checked);
             if (checkBox1.Checked)
@@ -246,7 +237,13 @@ namespace SimpleGrainGrowth
                 int x = random.Next(0, grid.GetCells().Count);
                 int y = random.Next(0, grid.GetCells()[0].Count);
 
-                if(CheckRadius(randomX, randomY, x, y, radius) && (!randomX.Contains(x) || !randomY.Contains(y)))
+                if(comboBox1.SelectedIndex == 0 && CheckRadiusAbsorbing(randomX, randomY, x, y, radius) && (!randomX.Contains(x) || !randomY.Contains(y)))
+                {
+                    randomX.Add(x);
+                    randomY.Add(y);
+                    attemps = 100000;
+                }
+                else if (comboBox1.SelectedIndex == 1 && CheckRadiusPeriodic(randomX, randomY, x, y, radius) && (!randomX.Contains(x) || !randomY.Contains(y)))
                 {
                     randomX.Add(x);
                     randomY.Add(y);
@@ -260,17 +257,15 @@ namespace SimpleGrainGrowth
                 Logs.Text = "Set: " + randomX.Count;
             }
             
-            
             for (int i = 0; i < randomX.Count; i++)
                 grid.SetCellType(randomX[i], randomY[i], i + 1);
 
             grid.PrintGrid(pictureBox1, g, bm, checkBox2.Checked);
             if (checkBox1.Checked)
                 grid.PrintMesh(pictureBox1, g, bm);
-            
         }
 
-        private bool CheckRadius(List<int> listX, List<int> listY, int x, int y, int r)
+        private bool CheckRadiusAbsorbing(List<int> listX, List<int> listY, int x, int y, int r)
         {
             for(int i = 0; i < listX.Count; i++)
             {
@@ -278,6 +273,30 @@ namespace SimpleGrainGrowth
                 {
                     return false;
                 }
+            }
+            return true;
+        }
+
+        private bool CheckRadiusPeriodic(List<int> listX, List<int> listY, int x, int y, int r)
+        {
+            for (int i = 0; i < listX.Count; i++)
+            {
+                int dx = grid.GetCells().Count;
+                int dy = grid.GetCells()[0].Count;
+                if ((Math.Pow(listX[i] - x, 2) + Math.Pow(listY[i] - y, 2)) <= Math.Pow(r, 2))
+                    return false;
+                if ((Math.Pow(listX[i] - (x + dx), 2) + Math.Pow(listY[i] - y, 2)) <= Math.Pow(r, 2))
+                    return false;
+                if ((Math.Pow(listX[i] - x, 2) + Math.Pow(listY[i] - (y + dy), 2)) <= Math.Pow(r, 2))
+                    return false;
+                if ((Math.Pow(listX[i] - (x + dx), 2) + Math.Pow(listY[i] - (y + dy), 2)) <= Math.Pow(r, 2))
+                    return false;
+                if ((Math.Pow(listX[i] - (x - dx), 2) + Math.Pow(listY[i] - y, 2)) <= Math.Pow(r, 2))
+                    return false;
+                if ((Math.Pow(listX[i] - x, 2) + Math.Pow(listY[i] - (y - dy), 2)) <= Math.Pow(r, 2))
+                    return false;
+                if ((Math.Pow(listX[i] - (x - dx), 2) + Math.Pow(listY[i] - (y - dy), 2)) <= Math.Pow(r, 2))
+                    return false;
             }
             return true;
         }
