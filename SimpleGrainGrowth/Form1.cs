@@ -110,8 +110,8 @@ namespace SimpleGrainGrowth
 
             grid = new Grid(pictureBox1, random, gridCellHeight, gridCellWidth);
             checkNeighbouthood = new CheckNeighbourhood(grid.CheckNeighbourhoodAbsorbing);
-            comboBox1.SelectedIndex = 1;
-            comboBox2.SelectedIndex = 1;
+            comboBox1.SelectedIndex = 0;
+            comboBox2.SelectedIndex = 0;
 
             grid.PrintGrid(pictureBox1, g, bm, checkBox2.Checked);
             if (checkBox1.Checked)
@@ -403,18 +403,30 @@ namespace SimpleGrainGrowth
         private void Button8_Click(object sender, EventArgs e)
         {
             int counter;
+            double kt = 0;
 
-            if (int.TryParse(textBox9.Text, out counter))
+            if (int.TryParse(textBox9.Text, out counter) && double.TryParse(textBox10.Text, out kt))
                 Logs.Text = "Success!";
             else
                 Logs.Text = "Fail!";
 
+            if (kt < -6)
+            {
+                kt = -6;
+                Logs.Text = kt.ToString();
+            }
+            if (kt > 0.1)
+            {
+                kt = 0.1;
+                Logs.Text = kt.ToString();
+            }
+                
             if (comboBox1.SelectedIndex == 0)
                 for (int i = 0; i < counter; i++)
-                    grid.MonteCarloAbsorbing();
+                    grid.MonteCarloAbsorbing(kt);
             else if (comboBox1.SelectedIndex == 1)
                 for (int i = 0; i < counter; i++)
-                    grid.MonteCarloPeriodic();
+                    grid.MonteCarloPeriodic(kt);
 
             grid.PrintGrid(pictureBox1, g, bm, checkBox2.Checked);
             if (checkBox1.Checked)

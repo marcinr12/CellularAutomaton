@@ -495,7 +495,7 @@ namespace SimpleGrainGrowth
             return mostCommonValue;
         }
 
-        public void MonteCarloAbsorbing()
+        public void MonteCarloAbsorbing(double kt)
         {
             int cellsCounter = this.gridCellHeight * this.gridCellWidth;
             int[] indexArray = Enumerable.Range(0, (cellsCounter)).ToArray();
@@ -543,6 +543,14 @@ namespace SimpleGrainGrowth
                 {
                     randomType = neighbours[random.Next(0, neighbours.Count)];
                     randomEnergy = CalculateEnergy(randomType, neighbours);
+                    int dE = randomEnergy - energy;
+
+                    if (random.Next(0, 101) > 100 * Math.Pow(Math.E, Convert.ToDouble(-dE / kt)))
+                    {
+                        Console.WriteLine(kt);
+                        break;
+                    }
+                        
                 }
 
                 //Console.WriteLine("energy: " + energy);
@@ -556,7 +564,7 @@ namespace SimpleGrainGrowth
             }
         }
 
-        public void MonteCarloPeriodic()
+        public void MonteCarloPeriodic(double kt)
         {
             int cellsCounter = this.gridCellHeight * this.gridCellWidth;
             int[] indexArray = Enumerable.Range(0, (cellsCounter)).ToArray();
@@ -579,22 +587,6 @@ namespace SimpleGrainGrowth
                 else if (selectedPatternIndex == 9)
                     index = random.Next(4, 8);
 
-                //if (patterns[index][0] == 1 && y - 1 >= 0 && x - 1 >= 0)
-                //    neighbours.Add(cells[y - 1][x - 1].GetType());
-                //if (patterns[index][1] == 1 && y - 1 >= 0)
-                //    neighbours.Add(cells[y - 1][x].GetType());
-                //if (patterns[index][2] == 1 && y - 1 >= 0 && x + 1 < cells[j].Count)
-                //    neighbours.Add(cells[y - 1][x + 1].GetType());
-                //if (patterns[index][3] == 1 && x + 1 < cells[j].Count)
-                //    neighbours.Add(cells[y][x + 1].GetType());
-                //if (patterns[index][4] == 1 && y + 1 < cells.Count && x + 1 < cells[j].Count)
-                //    neighbours.Add(cells[y + 1][x + 1].GetType());
-                //if (patterns[index][5] == 1 && y + 1 < cells.Count)
-                //    neighbours.Add(cells[y + 1][x].GetType());
-                //if (patterns[index][6] == 1 && y + 1 < cells.Count && x - 1 >= 0)
-                //    neighbours.Add(cells[y + 1][x - 1].GetType());
-                //if (patterns[index][7] == 1 && x - 1 >= 0)
-                //    neighbours.Add(cells[y][x - 1].GetType());
                 if (patterns[index][0] == 1)
                 {
                     if(y - 1 >= 0 && x - 1 >= 0)
@@ -679,6 +671,14 @@ namespace SimpleGrainGrowth
                 {
                     randomType = neighbours[random.Next(0, neighbours.Count)];
                     randomEnergy = CalculateEnergy(randomType, neighbours);
+                    int dE = randomEnergy - energy;
+
+                    if (random.Next(0, 101) > 100 * Math.Pow(Math.E, Convert.ToDouble(-dE / kt)))
+                    {
+                        Console.WriteLine(kt);
+                        break;
+                    }
+
                 }
 
                 //Console.WriteLine("energy: " + energy);

@@ -61,6 +61,9 @@
             this.button8 = new System.Windows.Forms.Button();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.textBox9 = new System.Windows.Forms.TextBox();
+            this.textBox10 = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -272,7 +275,7 @@
             // Logs
             // 
             this.Logs.AutoSize = true;
-            this.Logs.Location = new System.Drawing.Point(12, 491);
+            this.Logs.Location = new System.Drawing.Point(9, 659);
             this.Logs.Name = "Logs";
             this.Logs.Size = new System.Drawing.Size(62, 17);
             this.Logs.TabIndex = 9;
@@ -406,22 +409,51 @@
             // 
             // groupBox7
             // 
+            this.groupBox7.Controls.Add(this.label4);
+            this.groupBox7.Controls.Add(this.label3);
+            this.groupBox7.Controls.Add(this.textBox10);
             this.groupBox7.Controls.Add(this.textBox9);
             this.groupBox7.Controls.Add(this.button8);
             this.groupBox7.Location = new System.Drawing.Point(156, 422);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(138, 86);
+            this.groupBox7.Size = new System.Drawing.Size(138, 149);
             this.groupBox7.TabIndex = 18;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "Monte Carlo";
             // 
             // textBox9
             // 
-            this.textBox9.Location = new System.Drawing.Point(9, 51);
+            this.textBox9.Location = new System.Drawing.Point(79, 67);
             this.textBox9.Name = "textBox9";
-            this.textBox9.Size = new System.Drawing.Size(123, 22);
+            this.textBox9.Size = new System.Drawing.Size(53, 22);
             this.textBox9.TabIndex = 18;
             this.textBox9.Text = "1";
+            // 
+            // textBox10
+            // 
+            this.textBox10.Location = new System.Drawing.Point(79, 112);
+            this.textBox10.Name = "textBox10";
+            this.textBox10.Size = new System.Drawing.Size(53, 22);
+            this.textBox10.TabIndex = 19;
+            this.textBox10.Text = "1";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(6, 92);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(80, 17);
+            this.label3.TabIndex = 20;
+            this.label3.Text = "kt <-6, 0.1>";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(6, 47);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(70, 17);
+            this.label4.TabIndex = 21;
+            this.label4.Text = "Iterations:";
             // 
             // Form1
             // 
@@ -497,6 +529,9 @@
         private System.Windows.Forms.Button button8;
         private System.Windows.Forms.GroupBox groupBox7;
         private System.Windows.Forms.TextBox textBox9;
+        private System.Windows.Forms.TextBox textBox10;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label3;
     }
 }
 
