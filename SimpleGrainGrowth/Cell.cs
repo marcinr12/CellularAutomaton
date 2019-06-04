@@ -66,6 +66,5 @@ namespace SimpleGrainGrowth
         {
             this.size = size;
         }
-
     }
 }

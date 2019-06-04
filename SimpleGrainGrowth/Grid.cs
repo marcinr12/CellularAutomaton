@@ -17,7 +17,7 @@ namespace SimpleGrainGrowth
         private int gridCellWidth = 10;
         private int gridCellHeight = 10;
         private double cellSize = 0;
-        private static Random random = new Random();
+        private Random random;// = new Random();
         private uint grains = 0;
 
 
@@ -25,8 +25,10 @@ namespace SimpleGrainGrowth
         private Dictionary<int, int[]> patterns = new Dictionary<int, int[]>();
         int selectedPatternIndex = 0;
 
-        public Grid(PictureBox pb, int gridCellHeight, int gridCellWidth)
+        public Grid(PictureBox pb, Random random, int gridCellHeight, int gridCellWidth)
         {
+            this.random = random;
+
             this.gridCellHeight = gridCellHeight;
             this.gridCellWidth = gridCellWidth;
 
@@ -439,7 +441,7 @@ namespace SimpleGrainGrowth
             }
         }
 
-        public static int GetMostRepeatedElenent(List<int> list)
+        public int GetMostRepeatedElenent(List<int> list)
         {
             int maxRepeats = 0;
             int mostCommonValue = 0;
@@ -466,7 +468,7 @@ namespace SimpleGrainGrowth
             return mostCommonValue;
         }
 
-        public static int GetMostRepeatedElenent(int[] array)
+        public int GetMostRepeatedElenent(int[] array)
         {
             int maxRepeats = 0;
             int mostCommonValue = 0;
@@ -495,70 +497,199 @@ namespace SimpleGrainGrowth
 
         public void MonteCarloAbsorbing()
         {
-            int[] cellsX = Enumerable.Range(0, (this.gridCellWidth)).ToArray();
-            int[] cellsY = Enumerable.Range(0, (this.gridCellHeight)).ToArray();
-            //int[] cellsX = { 1 };
-            //int[] cellsY = { 1 };
+            int cellsCounter = this.gridCellHeight * this.gridCellWidth;
+            int[] indexArray = Enumerable.Range(0, (cellsCounter)).ToArray();
 
+            Shuffle(indexArray, random);
 
-            //PrintArray(cellsX);
-            //PrintArray(cellsY);
-            Shuffle(cellsX);
-            Shuffle(cellsY);
             int index = selectedPatternIndex;
             List<int> neighbours = new List<int>();
 
-            for(int i = 0; i < cellsX.Length; i++)
+            for(int i = 0; i < indexArray.Count(); i++)
             {
-                for(int j = 0; j < cellsY.Length; j++)
-                {
-                    int y = cellsX[i];
-                    int x = cellsY[j];
+                int x = indexArray[i] % this.gridCellWidth;
+                int y = indexArray[i] / this.gridCellWidth;
+                int j = i / this.gridCellWidth;
 
-                    if (selectedPatternIndex == 8)
-                        index = random.Next(2, 4);
-                    else if (selectedPatternIndex == 9)
-                        index = random.Next(4, 8);
+                if (selectedPatternIndex == 8)
+                    index = random.Next(2, 4);
+                else if (selectedPatternIndex == 9)
+                    index = random.Next(4, 8);
 
-                    if (patterns[index][0] == 1 && x - 1 >= 0 && y - 1 >= 0)
-                        neighbours.Add(cells[x - 1][y - 1].GetType());
-                    if (patterns[index][1] == 1 && x - 1 >= 0)
-                        neighbours.Add(cells[x - 1][y].GetType());
-                    if (patterns[index][2] == 1 && x - 1 >= 0 && y + 1 < cells[j].Count)
-                        neighbours.Add(cells[x - 1][y + 1].GetType());
-                    if (patterns[index][3] == 1 && y + 1 < cells[j].Count)
-                        neighbours.Add(cells[x][y + 1].GetType());
-                    if (patterns[index][4] == 1 && x + 1 < cells.Count && y + 1 < cells[j].Count)
-                        neighbours.Add(cells[x + 1][y + 1].GetType());
-                    if (patterns[index][5] == 1 && x + 1 < cells.Count)
-                        neighbours.Add(cells[x + 1][y].GetType());
-                    if (patterns[index][6] == 1 && x + 1 < cells.Count && y - 1 >= 0)
-                        neighbours.Add(cells[x + 1][y - 1].GetType());
-                    if (patterns[index][7] == 1 && y - 1 >= 0)
-                        neighbours.Add(cells[x][y - 1].GetType());
+                if (patterns[index][0] == 1 && y - 1 >= 0 && x - 1 >= 0)
+                    neighbours.Add(cells[y - 1][x - 1].GetType());
+                if (patterns[index][1] == 1 && y - 1 >= 0)
+                    neighbours.Add(cells[y - 1][x].GetType());
+                if (patterns[index][2] == 1 && y - 1 >= 0 && x + 1 < cells[j].Count)
+                    neighbours.Add(cells[y - 1][x + 1].GetType());
+                if (patterns[index][3] == 1 && x + 1 < cells[j].Count)
+                    neighbours.Add(cells[y][x + 1].GetType());
+                if (patterns[index][4] == 1 && y + 1 < cells.Count && x + 1 < cells[j].Count)
+                    neighbours.Add(cells[y + 1][x + 1].GetType());
+                if (patterns[index][5] == 1 && y + 1 < cells.Count)
+                    neighbours.Add(cells[y + 1][x].GetType());
+                if (patterns[index][6] == 1 && y + 1 < cells.Count && x - 1 >= 0)
+                    neighbours.Add(cells[y + 1][x - 1].GetType());
+                if (patterns[index][7] == 1 && x - 1 >= 0)
+                    neighbours.Add(cells[y][x - 1].GetType());
                     
 
-                    int energy = CalculateEnergy(this.cells[x][y].GetType(), neighbours);
-                    int randomType = neighbours[random.Next(0, neighbours.Count)];
-                    int randomEnergy = CalculateEnergy(randomType, neighbours);
+                int energy = CalculateEnergy(this.cells[y][x].GetType(), neighbours);
+                int randomType = neighbours[random.Next(0, neighbours.Count)];
+                int randomEnergy = CalculateEnergy(randomType, neighbours);
 
 
-                    while(energy < randomEnergy)
-                    {
-                        randomType = neighbours[random.Next(0, neighbours.Count)];
-                        randomEnergy = CalculateEnergy(randomType, neighbours);
-                    }
-
-                    //Console.WriteLine("energy: " + energy);
-                    //Console.WriteLine("randomType: " + randomType);
-                    //Console.WriteLine("randomEnergy: " + randomEnergy);
-                    //PrintList(neighbours);
-
-                    this.cells[x][y].SetType(randomType);
-                    neighbours = new List<int>();
+                while(energy < randomEnergy)
+                {
+                    randomType = neighbours[random.Next(0, neighbours.Count)];
+                    randomEnergy = CalculateEnergy(randomType, neighbours);
                 }
-            }
 
+                //Console.WriteLine("energy: " + energy);
+                //Console.WriteLine("randomType: " + randomType);
+                //Console.WriteLine("randomEnergy: " + randomEnergy);
+                //PrintList(neighbours);
+
+                this.cells[y][x].SetType(randomType);
+                neighbours = new List<int>();
+
+            }
+        }
+
+        public void MonteCarloPeriodic()
+        {
+            int cellsCounter = this.gridCellHeight * this.gridCellWidth;
+            int[] indexArray = Enumerable.Range(0, (cellsCounter)).ToArray();
+            int h = this.gridCellHeight - 1;
+            int w = this.gridCellWidth - 1;
+
+            Shuffle(indexArray, random);
+
+            int index = selectedPatternIndex;
+            List<int> neighbours = new List<int>();
+
+            for (int i = 0; i < indexArray.Count(); i++)
+            {
+                int x = indexArray[i] % this.gridCellWidth;
+                int y = indexArray[i] / this.gridCellWidth;
+                int j = i / this.gridCellWidth;
+
+                if (selectedPatternIndex == 8)
+                    index = random.Next(2, 4);
+                else if (selectedPatternIndex == 9)
+                    index = random.Next(4, 8);
+
+                //if (patterns[index][0] == 1 && y - 1 >= 0 && x - 1 >= 0)
+                //    neighbours.Add(cells[y - 1][x - 1].GetType());
+                //if (patterns[index][1] == 1 && y - 1 >= 0)
+                //    neighbours.Add(cells[y - 1][x].GetType());
+                //if (patterns[index][2] == 1 && y - 1 >= 0 && x + 1 < cells[j].Count)
+                //    neighbours.Add(cells[y - 1][x + 1].GetType());
+                //if (patterns[index][3] == 1 && x + 1 < cells[j].Count)
+                //    neighbours.Add(cells[y][x + 1].GetType());
+                //if (patterns[index][4] == 1 && y + 1 < cells.Count && x + 1 < cells[j].Count)
+                //    neighbours.Add(cells[y + 1][x + 1].GetType());
+                //if (patterns[index][5] == 1 && y + 1 < cells.Count)
+                //    neighbours.Add(cells[y + 1][x].GetType());
+                //if (patterns[index][6] == 1 && y + 1 < cells.Count && x - 1 >= 0)
+                //    neighbours.Add(cells[y + 1][x - 1].GetType());
+                //if (patterns[index][7] == 1 && x - 1 >= 0)
+                //    neighbours.Add(cells[y][x - 1].GetType());
+                if (patterns[index][0] == 1)
+                {
+                    if(y - 1 >= 0 && x - 1 >= 0)
+                        neighbours.Add(cells[y - 1][x - 1].GetType());
+                    else if (y - 1 < 0 && x - 1 >= 0)
+                        neighbours.Add(cells[h][x - 1].GetType());
+                    else if (y - 1 >= 0 && x - 1 < 0)
+                        neighbours.Add(cells[y - 1][w].GetType());
+                    else
+                        neighbours.Add(cells[h][w].GetType());
+                }
+                if (patterns[index][1] == 1)
+                {
+                    if (y - 1 >= 0)
+                        neighbours.Add(cells[y - 1][x].GetType());
+                    else
+                        neighbours.Add(cells[h][x].GetType());
+                }
+                if (patterns[index][2] == 1)
+                {
+                    if (y - 1 >= 0 && x + 1 < cells[j].Count)
+                        neighbours.Add(cells[y - 1][x + 1].GetType());
+                    else if (y - 1 >= 0 && x + 1 >= cells[j].Count)
+                        neighbours.Add(cells[y - 1][0].GetType());
+                    else if (y - 1 < 0 && x + 1 < cells[j].Count)
+                        neighbours.Add(cells[h][x + 1].GetType());
+                    else
+                        neighbours.Add(cells[h][w].GetType());
+                }
+                if (patterns[index][3] == 1)
+                {
+                    if (x + 1 < cells[j].Count)
+                        neighbours.Add(cells[y][x + 1].GetType());
+                    else
+                        neighbours.Add(cells[y][0].GetType());
+                }
+                if (patterns[index][4] == 1)
+                {
+                    if (y + 1 < cells.Count && x + 1 < cells[j].Count)
+                        neighbours.Add(cells[y + 1][x + 1].GetType());
+                    else if (y + 1 < cells.Count && x + 1 >= cells[j].Count)
+                        neighbours.Add(cells[y + 1][0].GetType());
+                    else if (y + 1 >= cells.Count && x + 1 < cells[j].Count)
+                        neighbours.Add(cells[0][x + 1].GetType());
+                    else
+                        neighbours.Add(cells[0][0].GetType());
+                }
+                if (patterns[index][5] == 1)
+                {
+                    if (y + 1 < cells.Count)
+                        neighbours.Add(cells[y + 1][x].GetType());
+                    else
+                        neighbours.Add(cells[0][x].GetType());
+                }
+                if (patterns[index][6] == 1)
+                {
+                    if (y + 1 < cells.Count && x - 1 >= 0)
+                        neighbours.Add(cells[y + 1][x - 1].GetType());
+                    else if (y + 1 < cells.Count && x - 1 < 0)
+                        neighbours.Add(cells[y + 1][w].GetType());
+                    else if (y + 1 >= cells.Count && x - 1 >= 0)
+                        neighbours.Add(cells[0][x - 1].GetType());
+                    else
+                        neighbours.Add(cells[0][w].GetType());
+                }
+                if (patterns[index][7] == 1)
+                {
+                    if (x - 1 >= 0)
+                        neighbours.Add(cells[y][x - 1].GetType());
+                    else
+                        neighbours.Add(cells[y][w].GetType());
+                }
+
+
+
+                int energy = CalculateEnergy(this.cells[y][x].GetType(), neighbours);
+                int randomType = neighbours[random.Next(0, neighbours.Count)];
+                int randomEnergy = CalculateEnergy(randomType, neighbours);
+
+
+                while (energy < randomEnergy)
+                {
+                    randomType = neighbours[random.Next(0, neighbours.Count)];
+                    randomEnergy = CalculateEnergy(randomType, neighbours);
+                }
+
+                //Console.WriteLine("energy: " + energy);
+                //Console.WriteLine("randomType: " + randomType);
+                //Console.WriteLine("randomEnergy: " + randomEnergy);
+                //PrintList(neighbours);
+
+                this.cells[y][x].SetType(randomType);
+                neighbours = new List<int>();
+
+            }
         }
 
         public static int CalculateEnergy(int type, List<int> neighbours)
@@ -590,9 +721,9 @@ namespace SimpleGrainGrowth
         }
 
         /// Knuth shuffle
-        public static void Shuffle(int[] array)
+        public static void Shuffle(int[] array, Random random)
         {
-            Random random = new Random();
+            //Random random = new Random();
             int n = array.Count();
             while (n > 1)
             {

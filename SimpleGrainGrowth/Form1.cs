@@ -30,12 +30,14 @@ namespace SimpleGrainGrowth
             g = Graphics.FromImage(bm);
             g.Clear(Color.White);
             pictureBox1.Image = bm;
-            grid = new Grid(pictureBox1, 33, 33);
+            grid = new Grid(pictureBox1, random, 33, 33);
 
-            comboBox1.SelectedIndex = 0;
-            comboBox2.SelectedIndex = 0;
+            comboBox1.SelectedIndex = 1;
+            comboBox2.SelectedIndex = 1;
             checkNeighbouthood = new CheckNeighbourhood(grid.CheckNeighbourhoodAbsorbing);
-            grid.PrintMesh(pictureBox1, g, bm);
+
+            if(checkBox1.Checked)
+                grid.PrintMesh(pictureBox1, g, bm);
 
         }
 
@@ -63,8 +65,6 @@ namespace SimpleGrainGrowth
             MouseEventArgs me = (MouseEventArgs)e;
             Point coordinates = me.Location;
             List<List<Cell>> cells = grid.GetCells();
-
-            
 
 
             for (int i = 0; i < cells.Count; i++)
@@ -108,10 +108,10 @@ namespace SimpleGrainGrowth
             else
                 Logs.Text = "Fail!";
 
-            grid = new Grid(pictureBox1, gridCellHeight, gridCellWidth);
+            grid = new Grid(pictureBox1, random, gridCellHeight, gridCellWidth);
             checkNeighbouthood = new CheckNeighbourhood(grid.CheckNeighbourhoodAbsorbing);
-            comboBox1.SelectedIndex = 0;
-            comboBox2.SelectedIndex = 0;
+            comboBox1.SelectedIndex = 1;
+            comboBox2.SelectedIndex = 1;
 
             grid.PrintGrid(pictureBox1, g, bm, checkBox2.Checked);
             if (checkBox1.Checked)
@@ -400,8 +400,6 @@ namespace SimpleGrainGrowth
                 grid.PrintMesh(pictureBox1, g, bm);
         }
 
-
-
         private void Button8_Click(object sender, EventArgs e)
         {
             int counter;
@@ -415,15 +413,14 @@ namespace SimpleGrainGrowth
                 for (int i = 0; i < counter; i++)
                     grid.MonteCarloAbsorbing();
             else if (comboBox1.SelectedIndex == 1)
-                Logs.Text = "TO DO";
+                for (int i = 0; i < counter; i++)
+                    grid.MonteCarloPeriodic();
 
-                grid.PrintGrid(pictureBox1, g, bm, checkBox2.Checked);
+            grid.PrintGrid(pictureBox1, g, bm, checkBox2.Checked);
             if (checkBox1.Checked)
                 grid.PrintMesh(pictureBox1, g, bm);
 
         }
-
-
 
     }
 }

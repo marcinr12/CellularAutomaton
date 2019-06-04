@@ -130,8 +130,6 @@
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Checked = true;
-            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox1.Location = new System.Drawing.Point(6, 108);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
@@ -251,7 +249,7 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(53, 22);
             this.textBox2.TabIndex = 9;
-            this.textBox2.Text = "55";
+            this.textBox2.Text = "99";
             // 
             // textBox1
             // 
@@ -259,7 +257,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(61, 22);
             this.textBox1.TabIndex = 8;
-            this.textBox1.Text = "55";
+            this.textBox1.Text = "100";
             // 
             // button3
             // 
@@ -298,7 +296,7 @@
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(50, 22);
             this.textBox4.TabIndex = 2;
-            this.textBox4.Text = "11";
+            this.textBox4.Text = "99";
             // 
             // textBox3
             // 
@@ -306,7 +304,7 @@
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(60, 22);
             this.textBox3.TabIndex = 1;
-            this.textBox3.Text = "11";
+            this.textBox3.Text = "100";
             // 
             // button4
             // 
