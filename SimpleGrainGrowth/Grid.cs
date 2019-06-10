@@ -19,7 +19,15 @@ namespace SimpleGrainGrowth
         private double cellSize = 0;
         private Random random;// = new Random();
         private uint grains = 0;
-
+        private Color[] energyColors = { Color.FromArgb(255, 255, 255),
+                    Color.FromArgb(102, 255, 255),
+                    Color.FromArgb(0, 204, 204),
+                    Color.FromArgb(178, 255, 102),
+                    Color.FromArgb(102, 204, 0),
+                    Color.FromArgb(255, 102, 102),
+                    Color.FromArgb(204, 0, 0),
+                    Color.FromArgb(0, 0, 0) };
+        private Boolean[,] lastRecrystallized;
 
 
         private Dictionary<int, int[]> patterns = new Dictionary<int, int[]>();
@@ -35,6 +43,7 @@ namespace SimpleGrainGrowth
             double cellSizeWidth = Convert.ToDouble(pb.Width / (gridCellWidth * 1.0));
             double cellSizeHeight = Convert.ToDouble(pb.Height / (gridCellHeight * 1.0));
             this.cellSize = (cellSizeHeight < cellSizeWidth) ? cellSizeHeight : cellSizeWidth;
+            this.lastRecrystallized = new Boolean[this.gridCellHeight, this.gridCellWidth];
 
 
             InitialPatterns();
@@ -54,7 +63,7 @@ namespace SimpleGrainGrowth
             this.patterns.Add(5, new int[] { 0, 1, 1, 1, 1, 1, 0, 0 });         // Pentagonal right
             this.patterns.Add(6, new int[] { 1, 1, 1, 1, 0, 0, 0, 1 });         // Pentagonal top
             this.patterns.Add(7, new int[] { 0, 0, 0, 1, 1, 1, 1, 1 });         // Pentagonal left
-        } 
+        }
 
         public void SetPatternIndex(int index)
         {
@@ -156,10 +165,15 @@ namespace SimpleGrainGrowth
                     else
                         color = Form1.GetRandomColorsList()[cell.GetType() - 1];
 
+                    ///////////////////////////////////
+                    if (cell.GetRecrystallized())
+                        color = Color.Red;
+                    ///////////////////////////////////
+                    ///
                     SolidBrush brush = new SolidBrush(color);
 
                     g.FillRectangle(brush, cell.GetPosition().X, cell.GetPosition().Y, cell.GetSize().Width + 1, cell.GetSize().Height + 1);
-                    if(displayCentersOfMass)
+                    if (displayCentersOfMass)
                     {
                         int r = 4;
                         g.FillEllipse(redB, cell.GetCenterOfMass().X - r / 2, cell.GetCenterOfMass().Y - r / 2, r, r);
@@ -168,6 +182,30 @@ namespace SimpleGrainGrowth
             }
             pb.Image = bm;
 
+        }
+
+        public void PrintEnergy(PictureBox pb, Graphics g, Bitmap bm)
+        {
+            g.Clear(Color.White);
+
+            for (int i = 0; i < gridCellHeight; i++)
+            {
+                for (int j = 0; j < gridCellWidth; j++)
+                {
+                    Cell cell = cells[i][j];
+
+                    Color color;
+                    if (cell.GetEnergy() > 0)
+                        color = this.energyColors[cell.GetEnergy()];
+                    else
+                        color = Color.White;
+
+                    SolidBrush brush = new SolidBrush(color);
+
+                    g.FillRectangle(brush, cell.GetPosition().X, cell.GetPosition().Y, cell.GetSize().Width + 1, cell.GetSize().Height + 1);
+                }
+            }
+            pb.Image = bm;
         }
 
         public List<List<int>> CheckNeighbourhoodAbsorbing(int radius = 0)
@@ -192,7 +230,7 @@ namespace SimpleGrainGrowth
             for (int i = 0; i < cells.Count; i++)
             {
                 for (int j = 0; j < cells[i].Count; j++)
-                {                 
+                {
                     type = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
                     int index = selectedPatternIndex;
 
@@ -200,7 +238,7 @@ namespace SimpleGrainGrowth
                         index = random.Next(2, 4);
                     else if (selectedPatternIndex == 9)
                         index = random.Next(4, 8);
-                   
+
 
                     if (patterns[index][0] == 1 && i + 1 < sizeY && j + 1 < sizeX)
                         type[0] = cells[i + 1][j + 1].GetType();
@@ -338,7 +376,7 @@ namespace SimpleGrainGrowth
         {
             int sizeY = cells.Count;
             int sizeX = cells[0].Count;
-            
+
 
             List<List<int>> neighbours = new List<List<int>>();
             for (int i = 0; i < sizeY; i++)
@@ -350,13 +388,13 @@ namespace SimpleGrainGrowth
 
             for (int i = 0; i < sizeY; i++)
             {
-                for(int j = 0; j < sizeX; j++)
+                for (int j = 0; j < sizeX; j++)
                 {
                     //Cell cell = cells[j][i];
                     if (cells[j][i].GetType() != 0)
                         continue;
                     List<int> cellNeighbours = new List<int>();
-                    
+
                     for (int k = 0; k < sizeY; k++)
                     {
                         for (int l = 0; l < sizeX; l++)
@@ -399,7 +437,7 @@ namespace SimpleGrainGrowth
                             if (Math.Pow(cell.GetCenterOfMass().X - cells[l][k].GetCenterOfMass().X, 2) +
                                 Math.Pow(cell.GetCenterOfMass().Y - cells[l][k].GetCenterOfMass().Y, 2) <= radius * radius)
                                 cellNeighbours.Add(cells[l][k].GetType());
-                            else if(Math.Pow(cell.GetCenterOfMass().X + (gridCellWidth * cellSize) - cells[l][k].GetCenterOfMass().X, 2) +
+                            else if (Math.Pow(cell.GetCenterOfMass().X + (gridCellWidth * cellSize) - cells[l][k].GetCenterOfMass().X, 2) +
                                 Math.Pow(cell.GetCenterOfMass().Y - cells[l][k].GetCenterOfMass().Y, 2) <= radius * radius)
                                 cellNeighbours.Add(cells[l][k].GetType());
                             else if (Math.Pow(cell.GetCenterOfMass().X - cells[l][k].GetCenterOfMass().X, 2) +
@@ -431,7 +469,7 @@ namespace SimpleGrainGrowth
             {
                 for (int j = 0; j < gridCellWidth; j++)
                 {
-                    
+
                     if (neighbours[i][j] > 0 && this.cells[i][j].GetType() == 0)
                     {
                         this.cells[i][j].SetType(neighbours[i][j]);
@@ -505,7 +543,7 @@ namespace SimpleGrainGrowth
             int index = selectedPatternIndex;
             List<int> neighbours = new List<int>();
 
-            for(int i = 0; i < indexArray.Count(); i++)
+            for (int i = 0; i < indexArray.Count(); i++)
             {
                 int x = indexArray[i] % this.gridCellWidth;
                 int y = indexArray[i] / this.gridCellWidth;
@@ -532,26 +570,27 @@ namespace SimpleGrainGrowth
                     neighbours.Add(cells[y + 1][x - 1].GetType());
                 if (patterns[index][7] == 1 && x - 1 >= 0)
                     neighbours.Add(cells[y][x - 1].GetType());
-                    
+
 
                 int energy = CalculateEnergy(this.cells[y][x].GetType(), neighbours);
                 int randomType = neighbours[random.Next(0, neighbours.Count)];
                 int randomEnergy = CalculateEnergy(randomType, neighbours);
 
 
-                while(energy < randomEnergy)
+                while (energy < randomEnergy)
                 {
                     randomType = neighbours[random.Next(0, neighbours.Count)];
                     randomEnergy = CalculateEnergy(randomType, neighbours);
                     int dE = randomEnergy - energy;
 
-                    if (random.Next(0, 101) > 100 * Math.Pow(Math.E, Convert.ToDouble(-dE / kt)))
-                    {
-                        Console.WriteLine(kt);
+                    //Console.WriteLine(Math.Pow(Math.E, Convert.ToDouble(-dE / kt)));
+
+                    if (random.NextDouble() < Math.Pow(Math.E, Convert.ToDouble(-dE / kt)))
                         break;
-                    }
-                        
+
                 }
+
+                
 
                 //Console.WriteLine("energy: " + energy);
                 //Console.WriteLine("randomType: " + randomType);
@@ -559,8 +598,8 @@ namespace SimpleGrainGrowth
                 //PrintList(neighbours);
 
                 this.cells[y][x].SetType(randomType);
+                this.cells[y][x].SetEnergy(randomEnergy);
                 neighbours = new List<int>();
-
             }
         }
 
@@ -589,7 +628,7 @@ namespace SimpleGrainGrowth
 
                 if (patterns[index][0] == 1)
                 {
-                    if(y - 1 >= 0 && x - 1 >= 0)
+                    if (y - 1 >= 0 && x - 1 >= 0)
                         neighbours.Add(cells[y - 1][x - 1].GetType());
                     else if (y - 1 < 0 && x - 1 >= 0)
                         neighbours.Add(cells[h][x - 1].GetType());
@@ -673,12 +712,10 @@ namespace SimpleGrainGrowth
                     randomEnergy = CalculateEnergy(randomType, neighbours);
                     int dE = randomEnergy - energy;
 
-                    if (random.Next(0, 101) > 100 * Math.Pow(Math.E, Convert.ToDouble(-dE / kt)))
-                    {
-                        Console.WriteLine(kt);
+                    //if (random.Next(0, 101) > 100 * Math.Pow(Math.E, Convert.ToDouble(-dE / kt)))
+                    //    break;
+                    if (random.NextDouble() < Math.Pow(Math.E, Convert.ToDouble(-dE / kt)))
                         break;
-                    }
-
                 }
 
                 //Console.WriteLine("energy: " + energy);
@@ -687,15 +724,56 @@ namespace SimpleGrainGrowth
                 //PrintList(neighbours);
 
                 this.cells[y][x].SetType(randomType);
+                this.cells[y][x].SetEnergy(randomEnergy);
                 neighbours = new List<int>();
 
+            }
+        }
+
+        public void CalculateEnergyForGrid()
+        {
+            int index = selectedPatternIndex;
+            List<int> neighbours = new List<int>();
+
+            for (int i = 0; i < this.gridCellHeight; i++)
+            {
+                for(int j = 0; j < this.gridCellWidth; j++)
+                {
+                    if (selectedPatternIndex == 8)
+                        index = random.Next(2, 4);
+                    else if (selectedPatternIndex == 9)
+                        index = random.Next(4, 8);
+
+                    if (patterns[index][0] == 1 && j - 1 >= 0 && i - 1 >= 0)
+                        neighbours.Add(cells[j - 1][i - 1].GetType());
+                    if (patterns[index][1] == 1 && j - 1 >= 0)
+                        neighbours.Add(cells[j - 1][i].GetType());
+                    if (patterns[index][2] == 1 && j - 1 >= 0 && i + 1 < cells[j].Count)
+                        neighbours.Add(cells[j - 1][i + 1].GetType());
+                    if (patterns[index][3] == 1 && i + 1 < cells[j].Count)
+                        neighbours.Add(cells[j][i + 1].GetType());
+                    if (patterns[index][4] == 1 && j + 1 < cells.Count && i + 1 < cells[j].Count)
+                        neighbours.Add(cells[j + 1][i + 1].GetType());
+                    if (patterns[index][5] == 1 && j + 1 < cells.Count)
+                        neighbours.Add(cells[j + 1][i].GetType());
+                    if (patterns[index][6] == 1 && j + 1 < cells.Count && i - 1 >= 0)
+                        neighbours.Add(cells[j + 1][i - 1].GetType());
+                    if (patterns[index][7] == 1 && i - 1 >= 0)
+                        neighbours.Add(cells[j][i - 1].GetType());
+
+                    int energy = CalculateEnergy(this.cells[j][i].GetType(), neighbours);
+
+                    this.cells[j][i].SetEnergy(energy);
+                    neighbours = new List<int>();
+
+                }
             }
         }
 
         public static int CalculateEnergy(int type, List<int> neighbours)
         {
             int energy = 0;
-            for(int i = 0; i < neighbours.Count; i++)
+            for (int i = 0; i < neighbours.Count; i++)
             {
                 if (neighbours[i] != type)
                     energy++;
@@ -733,6 +811,198 @@ namespace SimpleGrainGrowth
                 array[i] = array[n];
                 array[n] = temp;
             }
+        }
+
+        public void Recrystallization(double A, double B, double timeStep, int step, double percentageForAll, Random random)
+        {
+            double ro = A / B + (1 - A / B) * Math.Pow(Math.E, -B * timeStep * step);
+            double prevRo = A / B + (1 - A / B) * Math.Pow(Math.E, -B * timeStep * (step - 1));
+            double dRo = Math.Abs(ro - prevRo);
+
+            double roPerCell = dRo / (this.gridCellHeight * this.gridCellWidth);
+            double roForAllPerCell = roPerCell / percentageForAll;
+
+            AddRecrystallizationDencityPerEveryCell(roForAllPerCell);
+
+            double roRandom = dRo * (100 - percentageForAll);
+            int packAmmount = random.Next(1, 101);
+            double packSize = roRandom / Convert.ToDouble(packAmmount);
+
+            AddRecrystallizationDencityRandom(packAmmount, packSize, random);
+            //Console.WriteLine(ro);
+
+        }
+
+        public void AddRecrystallizationDencityPerEveryCell(double roPerCell)
+        {
+            for (int i = 0; i < cells.Count; i++)
+                for (int j = 0; j < cells[0].Count; j++)
+                    cells[i][j].AddDislocationDensity(roPerCell);
+        }
+
+        public void AddRecrystallizationDencityRandom(int packAmmount, double packSize, Random random)
+        {
+            for (int i = 0; i < packAmmount; i++)
+            {
+                int index = random.Next(0, this.gridCellHeight * this.gridCellWidth);
+                int x = index % this.gridCellWidth;
+                int y = index / this.gridCellWidth;
+
+                int probability = random.Next(0, 101);
+
+                if (cells[y][x].GetEnergy() > 0)
+                {
+                    if(probability <= 80)
+                        cells[y][x].AddDislocationDensity(packSize);
+                }
+                else
+                {
+                    Debug.WriteLine("WORK!!!");
+                    if (probability >= 80)
+                        cells[y][x].AddDislocationDensity(packSize);
+                }
+                    
+            }
+
+        }
+
+        public void Recovery()
+        {
+            Boolean[,] recrystallized = new Boolean[cells.Count, cells[0].Count];
+
+            double roC = 4215840142323.42 / (this.gridCellHeight * this.gridCellWidth);
+
+            for (int i = 0; i< cells.Count; i++)
+            {
+                for(int j = 0; j < cells[0].Count; j++)
+                {
+                    if(cells[i][j].GetDislocationDensity() > roC && cells[i][j].GetEnergy() > 0)
+                    {
+                        cells[i][j].SetRecrystallized(true);
+                        recrystallized[i, j] = true;
+                        cells[i][j].SetDislocationDensity(0);
+                    }
+                    //else      // deleting seeds from last interation
+                    //    cells[i][j].SetRecrystallized(false);
+                }
+            }
+
+            for (int i = 0; i < cells.Count; i++)
+                for (int j = 0; j < cells[0].Count; j++)
+                    lastRecrystallized[i, j] = recrystallized[i, j];
+        }
+
+        public void IterationOfRecrystallizationAbsorbing()
+        {
+            int sizeY = cells.Count;
+            int sizeX = cells[0].Count;
+
+            Boolean[,] thisIteration = new Boolean[cells.Count, cells[0].Count];
+            for (int i = 0; i < cells.Count; i++)
+                for (int j = 0; j < cells[0].Count; j++)
+                    thisIteration[i, j] = lastRecrystallized[i, j];
+
+
+            //cells.Count       -> rows counter
+            //cells[0].Count    -> columns counter
+            for (int i = 0; i < cells.Count; i++)
+            {
+                for (int j = 0; j < cells[i].Count; j++)
+                {
+                    int index = selectedPatternIndex;
+
+                    if (selectedPatternIndex == 8)
+                        index = random.Next(2, 4);
+                    else if (selectedPatternIndex == 9)
+                        index = random.Next(4, 8);
+
+                    Boolean recrystallizedNeighbour = false;
+                    Boolean lowerDencity = true;
+
+                    if (patterns[index][0] == 1 && i + 1 < sizeY && j + 1 < sizeX)
+                    {
+                        if (this.lastRecrystallized[i + 1, j + 1] == true)
+                            recrystallizedNeighbour = true;
+                        if (cells[i + 1][j + 1].GetDislocationDensity() > cells[i][j].GetDislocationDensity())
+                            lowerDencity = false;
+                    }
+                    if (patterns[index][1] == 1 && i + 1 < sizeY)
+                                            {
+                        if (this.lastRecrystallized[i + 1, j] == true)
+                            recrystallizedNeighbour = true;
+                        if (cells[i + 1][j].GetDislocationDensity() > cells[i][j].GetDislocationDensity())
+                            lowerDencity = false;
+                    }
+                    if (patterns[index][2] == 1 && i + 1 < sizeY && j - 1 >= 0)
+                    {
+                        if (this.lastRecrystallized[i + 1, j - 1] == true)
+                            recrystallizedNeighbour = true;
+                        if (cells[i + 1][j - 1].GetDislocationDensity() > cells[i][j].GetDislocationDensity())
+                            lowerDencity = false;
+                    }
+                    if (patterns[index][3] == 1 && j - 1 >= 0)
+                    {
+                        if (this.lastRecrystallized[i, j - 1] == true)
+                            recrystallizedNeighbour = true;
+                        if (cells[i][j - 1].GetDislocationDensity() > cells[i][j].GetDislocationDensity())
+                            lowerDencity = false;
+                    }
+                    if (patterns[index][4] == 1 && i - 1 >= 0 && j - 1 >= 0)
+                    {
+                        if (this.lastRecrystallized[i - 1, j - 1] == true)
+                            recrystallizedNeighbour = true;
+                        if (cells[i - 1][j - 1].GetDislocationDensity() > cells[i][j].GetDislocationDensity())
+                            lowerDencity = false;
+                    }
+                    if (patterns[index][5] == 1 && i - 1 >= 0)
+                    {
+                        if (this.lastRecrystallized[i - 1, j] == true)
+                            recrystallizedNeighbour = true;
+                        if (cells[i - 1][j].GetDislocationDensity() > cells[i][j].GetDislocationDensity())
+                            lowerDencity = false;
+                    }
+                    if (patterns[index][6] == 1 && i - 1 >= 0 && j + 1 < sizeX)
+                    {
+                        if (this.lastRecrystallized[i - 1, j + 1] == true)
+                            recrystallizedNeighbour = true;
+                        if (cells[i - 1][j + 1].GetDislocationDensity() > cells[i][j].GetDislocationDensity())
+                            lowerDencity = false;
+                    }
+                    if (patterns[index][7] == 1 && j + 1 < sizeX)
+                    {
+                        if (this.lastRecrystallized[i, j + 1] == true)
+                            recrystallizedNeighbour = true;
+                        if (cells[i][j + 1].GetDislocationDensity() > cells[i][j].GetDislocationDensity())
+                            lowerDencity = false;
+                    }
+
+                    if (recrystallizedNeighbour && lowerDencity)
+                    {
+                        cells[i][j].SetRecrystallized(true);
+                        cells[i][j].SetDislocationDensity(0);
+                        thisIteration[i, j] = true;
+                    }
+                    //else
+                        //thisIteration[i, j] = false;
+                }
+            }
+            for (int i = 0; i < cells.Count; i++)
+                for (int j = 0; j < cells[0].Count; j++)
+                    if(thisIteration[i,j] == false)
+                        lastRecrystallized[i, j] = thisIteration[i, j];
+        }
+
+        public void PrintRecrystallisation()
+        {
+            for(int i = 0; i < lastRecrystallized.GetLength(0); i++)
+            {
+                for (int j = 0; j< lastRecrystallized.GetLength(1); j++)
+                {
+                    Console.Write(Convert.ToInt32(lastRecrystallized[i, j]) + " ");
+                }
+                Console.WriteLine();
+            }
+            Console.WriteLine();
         }
 
     }

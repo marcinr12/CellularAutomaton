@@ -60,10 +60,13 @@
             this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.button8 = new System.Windows.Forms.Button();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
-            this.textBox9 = new System.Windows.Forms.TextBox();
-            this.textBox10 = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
+            this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textBox10 = new System.Windows.Forms.TextBox();
+            this.textBox9 = new System.Windows.Forms.TextBox();
+            this.button9 = new System.Windows.Forms.Button();
+            this.button10 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -252,7 +255,7 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(53, 22);
             this.textBox2.TabIndex = 9;
-            this.textBox2.Text = "99";
+            this.textBox2.Text = "100";
             // 
             // textBox1
             // 
@@ -299,7 +302,7 @@
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(50, 22);
             this.textBox4.TabIndex = 2;
-            this.textBox4.Text = "99";
+            this.textBox4.Text = "100";
             // 
             // textBox3
             // 
@@ -399,9 +402,9 @@
             // 
             // button8
             // 
-            this.button8.Location = new System.Drawing.Point(9, 21);
+            this.button8.Location = new System.Drawing.Point(6, 21);
             this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(123, 23);
+            this.button8.Size = new System.Drawing.Size(126, 23);
             this.button8.TabIndex = 17;
             this.button8.Text = "MC";
             this.button8.UseVisualStyleBackColor = true;
@@ -409,6 +412,7 @@
             // 
             // groupBox7
             // 
+            this.groupBox7.Controls.Add(this.checkBox3);
             this.groupBox7.Controls.Add(this.label4);
             this.groupBox7.Controls.Add(this.label3);
             this.groupBox7.Controls.Add(this.textBox10);
@@ -416,35 +420,21 @@
             this.groupBox7.Controls.Add(this.button8);
             this.groupBox7.Location = new System.Drawing.Point(156, 422);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(138, 149);
+            this.groupBox7.Size = new System.Drawing.Size(138, 188);
             this.groupBox7.TabIndex = 18;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "Monte Carlo";
             // 
-            // textBox9
+            // checkBox3
             // 
-            this.textBox9.Location = new System.Drawing.Point(79, 67);
-            this.textBox9.Name = "textBox9";
-            this.textBox9.Size = new System.Drawing.Size(53, 22);
-            this.textBox9.TabIndex = 18;
-            this.textBox9.Text = "1";
-            // 
-            // textBox10
-            // 
-            this.textBox10.Location = new System.Drawing.Point(79, 112);
-            this.textBox10.Name = "textBox10";
-            this.textBox10.Size = new System.Drawing.Size(53, 22);
-            this.textBox10.TabIndex = 19;
-            this.textBox10.Text = "1";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 92);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(80, 17);
-            this.label3.TabIndex = 20;
-            this.label3.Text = "kt <-6, 0.1>";
+            this.checkBox3.AutoSize = true;
+            this.checkBox3.Location = new System.Drawing.Point(9, 140);
+            this.checkBox3.Name = "checkBox3";
+            this.checkBox3.Size = new System.Drawing.Size(124, 21);
+            this.checkBox3.TabIndex = 23;
+            this.checkBox3.Text = "Display energy";
+            this.checkBox3.UseVisualStyleBackColor = true;
+            this.checkBox3.CheckedChanged += new System.EventHandler(this.CheckBox3_CheckedChanged);
             // 
             // label4
             // 
@@ -455,11 +445,58 @@
             this.label4.TabIndex = 21;
             this.label4.Text = "Iterations:";
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(6, 92);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(71, 17);
+            this.label3.TabIndex = 20;
+            this.label3.Text = "kt <0,1 6>";
+            // 
+            // textBox10
+            // 
+            this.textBox10.Location = new System.Drawing.Point(79, 112);
+            this.textBox10.Name = "textBox10";
+            this.textBox10.Size = new System.Drawing.Size(53, 22);
+            this.textBox10.TabIndex = 19;
+            this.textBox10.Text = "0,1";
+            // 
+            // textBox9
+            // 
+            this.textBox9.Location = new System.Drawing.Point(79, 67);
+            this.textBox9.Name = "textBox9";
+            this.textBox9.Size = new System.Drawing.Size(59, 22);
+            this.textBox9.TabIndex = 24;
+            this.textBox9.Text = "100";
+            // 
+            // button9
+            // 
+            this.button9.Location = new System.Drawing.Point(12, 442);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(132, 23);
+            this.button9.TabIndex = 19;
+            this.button9.Text = "Recrystallization";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.Button9_Click);
+            // 
+            // button10
+            // 
+            this.button10.Location = new System.Drawing.Point(12, 471);
+            this.button10.Name = "button10";
+            this.button10.Size = new System.Drawing.Size(132, 23);
+            this.button10.TabIndex = 13;
+            this.button10.Text = "Next iteration";
+            this.button10.UseVisualStyleBackColor = true;
+            this.button10.Click += new System.EventHandler(this.Button10_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(968, 685);
+            this.Controls.Add(this.button10);
+            this.Controls.Add(this.button9);
             this.Controls.Add(this.groupBox7);
             this.Controls.Add(this.groupBox6);
             this.Controls.Add(this.groupBox5);
@@ -532,6 +569,9 @@
         private System.Windows.Forms.TextBox textBox10;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox checkBox3;
+        private System.Windows.Forms.Button button9;
+        private System.Windows.Forms.Button button10;
     }
 }
 

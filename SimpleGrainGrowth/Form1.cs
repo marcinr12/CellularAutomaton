@@ -306,7 +306,13 @@ namespace SimpleGrainGrowth
             List<List<Cell>> cells = grid.GetCells();
             for (int i = 0; i < cells.Count; i++)
                 for (int j = 0; j < cells[i].Count; j++)
+                {
                     cells[i][j].SetType(0);
+                    cells[i][j].SetRecrystallized(false);
+                    cells[i][j].SetDislocationDensity(0);
+                    cells[i][j].SetEnergy(0);
+                }
+                    
             grid.SetGrains(Convert.ToUInt32(0));
             CreateRandomColorsList(0);
 
@@ -410,12 +416,12 @@ namespace SimpleGrainGrowth
             else
                 Logs.Text = "Fail!";
 
-            if (kt < -6)
+            if (kt > 6)
             {
-                kt = -6;
+                kt = 6;
                 Logs.Text = kt.ToString();
             }
-            if (kt > 0.1)
+            if (kt < 0.1)
             {
                 kt = 0.1;
                 Logs.Text = kt.ToString();
@@ -428,11 +434,47 @@ namespace SimpleGrainGrowth
                 for (int i = 0; i < counter; i++)
                     grid.MonteCarloPeriodic(kt);
 
-            grid.PrintGrid(pictureBox1, g, bm, checkBox2.Checked);
+            if(checkBox3.Checked)
+                grid.PrintEnergy(pictureBox1, g, bm);
+            else
+                grid.PrintGrid(pictureBox1, g, bm, checkBox2.Checked);
+
             if (checkBox1.Checked)
                 grid.PrintMesh(pictureBox1, g, bm);
 
         }
 
+        private void CheckBox3_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox3.Checked)
+                grid.PrintEnergy(pictureBox1, g, bm);
+            else
+                grid.PrintGrid(pictureBox1, g, bm, checkBox2.Checked);
+        }
+
+
+        double timeStep = 0.001;
+        int step = 0;
+        private void Button9_Click(object sender, EventArgs e)
+        {
+            double A = 86710969050178.5;
+            double B = 9.41268203527779;
+            grid.Recrystallization(A, B, timeStep, step, 10, random);
+            grid.Recovery();
+            //grid.IterationOfRecrystallizationAbsorbing();
+            //Console.WriteLine(step * timeStep);
+            step++;
+            grid.PrintGrid(pictureBox1, g, bm, checkBox2.Checked);
+
+
+            //grid.PrintRecrystallisation();
+
+        }
+
+        private void Button10_Click(object sender, EventArgs e)
+        {
+            grid.IterationOfRecrystallizationAbsorbing();
+            grid.PrintGrid(pictureBox1, g, bm, checkBox2.Checked);
+        }
     }
 }
